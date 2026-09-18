@@ -1,1 +1,53 @@
+//DIGITAL_LOCK_DOOR
+#include <Servo.h>
+Servo doorServo;
+int buttonPin = 2;
+int greenLED = 5;
+int redLED = 3;
+int pressCount = 0;
+int lastButtonState = HIGH;
+int buttonState;
+void setup() {
+  doorServo.attach(9);
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(greenLED, OUTPUT);
+  pinMode(redLED, OUTPUT);
+  doorServo.write(0);
+  digitalWrite(redLED, HIGH);
+  digitalWrite(greenLED, LOW);
+  Serial.begin(9600);
+}
 
+void loop() {
+
+buttonState = digitalRead(buttonPin);
+if (lastButtonState == HIGH && buttonState == LOW) {
+    pressCount++;
+    Serial.print("Press: ");
+    Serial.println(pressCount);
+    while (buttonState == LOW) {
+      delay(10);
+    }
+    delay(50);
+  }
+
+  lastButtonState = digitalRead(buttonPin);
+
+  if (pressCount == 3) {
+
+    Serial.println("ACCESS GRANTED");
+    doorServo.write(90);
+    digitalWrite(redLED, LOW);
+    digitalWrite(greenLED, HIGH);
+
+    delay(3000);
+
+    doorServo.write(0);
+
+    digitalWrite(greenLED, LOW);
+    digitalWrite(redLED, HIGH);
+
+    pressCount = 0;
+
+    delay(500);
+  }
